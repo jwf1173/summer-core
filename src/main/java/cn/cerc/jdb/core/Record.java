@@ -418,6 +418,18 @@ public class Record implements IRecord, Serializable {
         }
     }
 
+    public boolean equalsValues(Map<String, Object> values) {
+        for (String field : values.keySet()) {
+            Object obj1 = getField(field);
+            String value = obj1 == null ? "null" : obj1.toString();
+            Object obj2 = values.get(field);
+            String compareValue = obj2 == null ? "null" : obj2.toString();
+            if (!value.equals(compareValue))
+                return false;
+        }
+        return true;
+    }
+
     public static void main(String[] args) {
         Record record = new Record();
         // record.getFieldDefs().add("num", new DoubleField(18, 4));
