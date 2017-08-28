@@ -25,13 +25,23 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
     private SearchDataSet search;
 
     public CustomDataSet append() {
+        return append(-1);
+    }
+
+    public CustomDataSet append(int index) {
         if (search != null)
             search.clear();
         Record record = new Record(this.fieldDefs);
         record.setDataSet(this);
         record.setState(DataSetState.dsInsert);
-        this.records.add(record);
-        recNo = records.size();
+
+        if (index == -1 || index == records.size()) {
+            this.records.add(record);
+            recNo = records.size();
+        } else {
+            this.records.add(index, record);
+            recNo = index + 1;
+        }
         if (onAfterAppend != null)
             onAfterAppend.execute(this);
         return this;
@@ -121,6 +131,11 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
         } else {
             this.recNo = recNo;
         }
+    }
+
+    public Record setIndex(int index) {
+        this.setRecNo(index + 1);
+        return this.getCurrent();
     }
 
     public int getRecNo() {
@@ -346,30 +361,6 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
     public boolean exists(String field) {
         return this.getFieldDefs().exists(field);
     }
-//
-//    // 将内容转成 Map
-//    public <T> Map<String, T> asMap(Class<T> clazz, String... keys) {
-//        Map<String, T> items = new HashMap<String, T>();
-//        for (Record rs : this) {
-//            String key = "";
-//            for (String field : keys) {
-//                if ("".equals(key))
-//                    key = rs.getString(field);
-//                else
-//                    key += ";" + rs.getString(field);
-//            }
-//            items.put(key, rs.asObject(clazz));
-//        }
-//        return items;
-//    }
-//
-//    // 将内容转成 List
-//    public <T> List<T> asList(Class<T> clazz) {
-//        List<T> items = new ArrayList<T>();
-//        for (Record rs : this)
-//            items.add(rs.asObject(clazz));
-//        return items;
-//    }
 
     public DataSetEvent getOnAfterAppend() {
         return onAfterAppend;
@@ -390,14 +381,5 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
 
     public void setOnBeforePost(DataSetEvent onBeforePost) {
         this.onBeforePost = onBeforePost;
-    }
-
-    public static void main(String[] args) {
-        CustomDataSet ds = new CustomDataSet();
-        System.out.println((ds.locate("PartCode_", "aa")));
-        ds.append();
-        System.out.println((ds.locate("PartCode_", "aa")));
-        ds.setField("PartCode_", "aa");
-        System.out.println((ds.locate("PartCode_", "aa")));
     }
 }
