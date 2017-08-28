@@ -133,7 +133,7 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
         }
     }
 
-    public Record setIndex(int index) {
+    public Record getIndex(int index) {
         this.setRecNo(index + 1);
         return this.getCurrent();
     }
