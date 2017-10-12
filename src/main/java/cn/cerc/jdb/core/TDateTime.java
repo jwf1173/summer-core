@@ -315,6 +315,20 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
         return cal.get(Calendar.DAY_OF_MONTH);
     }
 
+    public int getHours() {
+        // 返回value的小时值
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.data);
+        return cal.get(Calendar.HOUR_OF_DAY);
+    }
+
+    public int getMinutes() {
+        // 返回value的分钟值
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.data);
+        return cal.get(Calendar.MINUTE);
+    }
+
     // 返回农历日期
     public String getGregDate() {
         Calendar cal = Calendar.getInstance();
