@@ -34,7 +34,7 @@ public class RecordTest {
         assertEquals(value2, (double) item.getField(field2), 0);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void test_setField_error1() {
         Record obj = new Record();
         item.setField("object", obj);
