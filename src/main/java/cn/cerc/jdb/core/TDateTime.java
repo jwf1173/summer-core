@@ -35,6 +35,7 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
         map.put("YYYY/MM/DD", "yyyy/MM/dd");
 
         dateFormats.put("yyyy-MM-dd HH:mm:ss", "\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}");
+        dateFormats.put("yyyy-MM-dd HH:mm", "\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}");
         dateFormats.put("yyyy-MM-dd", "\\d{4}-\\d{2}-\\d{2}");
         dateFormats.put("yyyy/MM/dd HH:mm:ss", "\\d{4}/\\d{2}/\\d{2}\\s\\d{2}:\\d{2}:\\d{2}");
         dateFormats.put("yyyy/MM/dd", "\\d{4}/\\d{2}/\\d{2}");
