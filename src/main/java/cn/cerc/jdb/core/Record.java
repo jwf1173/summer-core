@@ -273,10 +273,16 @@ public class Record implements IRecord, Serializable {
         } else if (obj instanceof String) {
             String str = (String) obj;
             if ("".equals(str))
-                return new BigInteger("0");
+                return BigInteger.valueOf(0);
             return new BigInteger(str);
+        } else if (obj instanceof Integer) {
+            return BigInteger.valueOf((Integer) obj);
+        } else if (obj instanceof Double) {
+            return BigInteger.valueOf(((Double) obj).longValue());
+        } else if (obj instanceof Long) {
+            return BigInteger.valueOf((Long) obj);
         } else {
-            return new BigInteger("0");
+            return BigInteger.valueOf(0);
         }
     }
 
@@ -456,6 +462,19 @@ public class Record implements IRecord, Serializable {
         record.setState(DataSetState.dsEdit);
         record.setField("num", 0);
         record.setField("num", 123452);
+
+        // 增加对BigInteger的测试
+        record.setField("num2", (int) 123);
+        System.out.println(record.getBigInteger("num2"));
+        record.setField("num2", 123452L);
+        System.out.println(record.getBigInteger("num2"));
+        record.setField("num2", 123452d);
+        System.out.println(record.getBigInteger("num2"));
+        record.setField("num2", "123452");
+        System.out.println(record.getBigInteger("num2"));
+        record.setField("num2", new Object());
+        System.out.println(record.getBigInteger("num2"));
+
         if (record.isModify()) {
             System.out.println("num old: " + record.getOldField("num"));
             System.out.println("num new: " + record.getField("num"));
