@@ -2,6 +2,7 @@ package cn.cerc.jdb.core;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -258,6 +259,24 @@ public class Record implements IRecord, Serializable {
             return (Boolean) obj ? 1 : 0;
         } else {
             return 0;
+        }
+    }
+
+    @Override
+    public BigInteger getBigInteger(String field) {
+        if (!defs.exists(field))
+            defs.add(field);
+
+        Object obj = this.getField(field);
+        if (obj instanceof BigInteger) {
+            return (BigInteger) obj;
+        } else if (obj instanceof String) {
+            String str = (String) obj;
+            if ("".equals(str))
+                return new BigInteger("0");
+            return new BigInteger(str);
+        } else {
+            return new BigInteger("0");
         }
     }
 

@@ -3,6 +3,7 @@
  */
 package cn.cerc.jdb.core;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -262,6 +263,11 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
     }
 
     @Override
+    public BigInteger getBigInteger(String field) {
+        return this.getCurrent().getBigInteger(field);
+    }
+
+    @Override
     public TDate getDate(String field) {
         return this.getCurrent().getDate(field);
     }
@@ -382,4 +388,5 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
     public void setOnBeforePost(DataSetEvent onBeforePost) {
         this.onBeforePost = onBeforePost;
     }
+
 }

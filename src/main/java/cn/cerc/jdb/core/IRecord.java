@@ -1,5 +1,7 @@
 package cn.cerc.jdb.core;
 
+import java.math.BigInteger;
+
 public interface IRecord {
 
     public boolean exists(String field);
@@ -7,6 +9,8 @@ public interface IRecord {
     public boolean getBoolean(String field);
 
     public int getInt(String field);
+
+    public BigInteger getBigInteger(String field);
 
     public double getDouble(String field);
 
