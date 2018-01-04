@@ -14,12 +14,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
 public class Record implements IRecord, Serializable {
+    private static final Logger log = Logger.getLogger(Record.class);
+
     private static final long serialVersionUID = 4454304132898734723L;
     private DataSetState state = DataSetState.dsNone;
     private FieldDefs defs = null;
@@ -51,6 +55,7 @@ public class Record implements IRecord, Serializable {
         this.state = dataSetState;
     }
 
+    @Override
     public Record setField(String field, Object value) {
         if (field == null || "".equals(field))
             throw new RuntimeException("field is null!");
@@ -245,6 +250,9 @@ public class Record implements IRecord, Serializable {
         Object obj = this.getField(field);
         if (obj instanceof Integer) {
             return (Integer) obj;
+        } else if (obj instanceof BigInteger) {
+            log.warn("type error: getInt() can not use BigInteger");
+            return ((BigInteger) obj).intValue();
         } else if (obj instanceof Double) {
             return ((Double) obj).intValue();
         } else if (obj instanceof String) {
@@ -464,7 +472,7 @@ public class Record implements IRecord, Serializable {
         record.setField("num", 123452);
 
         // 增加对BigInteger的测试
-        record.setField("num2", (int) 123);
+        record.setField("num2", 123);
         System.out.println(record.getBigInteger("num2"));
         record.setField("num2", 123452L);
         System.out.println(record.getBigInteger("num2"));
