@@ -4,7 +4,6 @@
     <groupId>cn.cerc</groupId>
     <artifactId>summer-core</artifactId>
     <version>1.3.3</version>
-    <name>java DataSet</name>
     <build>
         <plugins>
             <plugin>
