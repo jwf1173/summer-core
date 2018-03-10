@@ -219,6 +219,24 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
         return new TDate(this.data);
     }
 
+    public TDateTime incSecond(int value) {
+        TDateTime result = this.clone();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(result.getData());
+        cal.set(Calendar.SECOND, value + cal.get(Calendar.SECOND));
+        result.setData(cal.getTime());
+        return result;
+    }
+
+    public TDateTime incMinute(int value) {
+        TDateTime result = this.clone();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(result.getData());
+        cal.set(Calendar.MINUTE, value + cal.get(Calendar.MINUTE));
+        result.setData(cal.getTime());
+        return result;
+    }
+
     public TDateTime incHour(int value) {
         TDateTime result = this.clone();
         Calendar cal = Calendar.getInstance();
