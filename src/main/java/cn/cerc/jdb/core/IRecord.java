@@ -1,5 +1,6 @@
 package cn.cerc.jdb.core;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public interface IRecord {
@@ -11,6 +12,8 @@ public interface IRecord {
     public int getInt(String field);
 
     public BigInteger getBigInteger(String field);
+
+    public BigDecimal getBigDecimal(String field);
 
     public double getDouble(String field);
 

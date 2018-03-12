@@ -295,6 +295,29 @@ public class Record implements IRecord, Serializable {
     }
 
     @Override
+    public BigDecimal getBigDecimal(String field) {
+        if (!defs.exists(field))
+            defs.add(field);
+        Object obj = this.getField(field);
+        if (obj instanceof BigInteger) {
+            return (BigDecimal) obj;
+        } else if (obj instanceof String) {
+            String str = (String) obj;
+            if ("".equals(str))
+                return BigDecimal.valueOf(0);
+            return new BigDecimal(str);
+        } else if (obj instanceof Integer) {
+            return BigDecimal.valueOf((Integer) obj);
+        } else if (obj instanceof Double) {
+            return BigDecimal.valueOf(((Double) obj).longValue());
+        } else if (obj instanceof Long) {
+            return BigDecimal.valueOf((Long) obj);
+        } else {
+            return BigDecimal.valueOf(0);
+        }
+    }
+
+    @Override
     public double getDouble(String field) {
         if (!defs.exists(field))
             defs.add(field);

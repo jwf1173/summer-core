@@ -3,6 +3,7 @@
  */
 package cn.cerc.jdb.core;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -197,6 +198,7 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
         return this.getCurrent().getState();
     }
 
+    @Override
     public Object getField(String field) {
         return this.getCurrent().getField(field);
     }
@@ -265,6 +267,11 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
     @Override
     public BigInteger getBigInteger(String field) {
         return this.getCurrent().getBigInteger(field);
+    }
+
+    @Override
+    public BigDecimal getBigDecimal(String field) {
+        return this.getCurrent().getBigDecimal(field);
     }
 
     @Override
