@@ -50,18 +50,20 @@ public class Record implements IRecord, Serializable {
                 return;
             }
         }
-        if (dataSetState.equals(DataSetState.dsNone))
+        if (dataSetState.equals(DataSetState.dsNone)) {
             delta.clear();
+        }
         this.state = dataSetState;
     }
 
     @Override
     public Record setField(String field, Object value) {
-        if (field == null || "".equals(field))
+        if (field == null || "".equals(field)) {
             throw new RuntimeException("field is null!");
-
-        if (!defs.exists(field))
+        }
+        if (!defs.exists(field)) {
             defs.add(field);
+        }
 
         if (this.state == DataSetState.dsEdit) {
             Object oldValue = items.get(field);
@@ -92,14 +94,13 @@ public class Record implements IRecord, Serializable {
             map.put(field, ((BigDecimal) value).doubleValue());
         } else if (value instanceof LinkedTreeMap) {
             map.put(field, null);
-        } else if (value instanceof BigDecimal)
-            map.put(field, ((BigDecimal) value).doubleValue());
-        else if (value instanceof Date) {
+        } else if (value instanceof Date) {
             map.put(field, value);
         } else if (value instanceof TDateTime) {
             map.put(field, ((TDateTime) value).getData());
-        } else
+        } else {
             map.put(field, value);
+        }
     }
 
     private boolean compareValue(Object value, Object compareValue) {
@@ -113,8 +114,9 @@ public class Record implements IRecord, Serializable {
                 Integer v1 = (Integer) value;
                 Double v2 = (Double) compareValue;
                 return v2 - v1 == 0;
-            } else
+            } else {
                 return value.equals(compareValue);
+            }
         } else {
             return false;
         }
@@ -122,8 +124,9 @@ public class Record implements IRecord, Serializable {
 
     @Override
     public Object getField(String field) {
-        if (field == null || "".equals(field))
+        if (field == null || "".equals(field)) {
             throw new RuntimeException("field is null!");
+        }
         return items.get(field);
     }
 
@@ -132,8 +135,9 @@ public class Record implements IRecord, Serializable {
     }
 
     public Object getOldField(String field) {
-        if (field == null || "".equals(field))
+        if (field == null || "".equals(field)) {
             throw new RuntimeException("field is null!");
+        }
         return delta.get(field);
     }
 
@@ -180,12 +184,13 @@ public class Record implements IRecord, Serializable {
         for (int i = 0; i < defs.size(); i++) {
             String field = defs.getFields().get(i);
             Object obj = this.getField(field);
-            if (obj instanceof TDateTime)
+            if (obj instanceof TDateTime) {
                 items.put(field, ((TDateTime) obj).toString());
-            else if (obj instanceof Date)
+            } else if (obj instanceof Date) {
                 items.put(field, (new TDateTime((Date) obj)).toString());
-            else
+            } else {
                 items.put(field, obj);
+            }
         }
         Gson gson = new GsonBuilder().serializeNulls().create();
         return gson.toJson(items);
@@ -203,8 +208,9 @@ public class Record implements IRecord, Serializable {
                 double tmp = (double) obj;
                 if (tmp >= Integer.MIN_VALUE && tmp <= Integer.MAX_VALUE) {
                     Integer val = (int) tmp;
-                    if (tmp == val)
+                    if (tmp == val) {
                         obj = val;
+                    }
                 }
             }
             setField(field, obj);
@@ -218,15 +224,17 @@ public class Record implements IRecord, Serializable {
         defs.clear();
         for (String key : items.keySet()) {
             defs.add(key);
-            if ("{}".equals(items.get(key)))
+            if ("{}".equals(items.get(key))) {
                 items.put(key, null);
+            }
         }
     }
 
     @Override
     public boolean getBoolean(String field) {
-        if (!defs.exists(field))
+        if (!defs.exists(field)) {
             defs.add(field);
+        }
 
         Object obj = this.getField(field);
         if (obj instanceof Boolean) {
@@ -248,8 +256,9 @@ public class Record implements IRecord, Serializable {
 
     @Override
     public int getInt(String field) {
-        if (!defs.exists(field))
+        if (!defs.exists(field)) {
             defs.add(field);
+        }
 
         Object obj = this.getField(field);
         if (obj instanceof Integer) {
@@ -261,8 +270,9 @@ public class Record implements IRecord, Serializable {
             return ((Double) obj).intValue();
         } else if (obj instanceof String) {
             String str = (String) obj;
-            if ("".equals(str))
+            if ("".equals(str)) {
                 return 0;
+            }
             double val = Double.valueOf(str);
             return (int) val;
         } else if (obj instanceof Long) {
@@ -276,16 +286,18 @@ public class Record implements IRecord, Serializable {
 
     @Override
     public BigInteger getBigInteger(String field) {
-        if (!defs.exists(field))
+        if (!defs.exists(field)) {
             defs.add(field);
+        }
 
         Object obj = this.getField(field);
         if (obj instanceof BigInteger) {
             return (BigInteger) obj;
         } else if (obj instanceof String) {
             String str = (String) obj;
-            if ("".equals(str))
+            if ("".equals(str)) {
                 return BigInteger.valueOf(0);
+            }
             return new BigInteger(str);
         } else if (obj instanceof Integer) {
             return BigInteger.valueOf((Integer) obj);
@@ -300,15 +312,17 @@ public class Record implements IRecord, Serializable {
 
     @Override
     public BigDecimal getBigDecimal(String field) {
-        if (!defs.exists(field))
+        if (!defs.exists(field)) {
             defs.add(field);
+        }
         Object obj = this.getField(field);
         if (obj instanceof BigInteger) {
             return (BigDecimal) obj;
         } else if (obj instanceof String) {
             String str = (String) obj;
-            if ("".equals(str))
+            if ("".equals(str)) {
                 return BigDecimal.valueOf(0);
+            }
             return new BigDecimal(str);
         } else if (obj instanceof Integer) {
             return BigDecimal.valueOf((Integer) obj);
@@ -323,29 +337,34 @@ public class Record implements IRecord, Serializable {
 
     @Override
     public double getDouble(String field) {
-        if (!defs.exists(field))
+        if (!defs.exists(field)) {
             defs.add(field);
+        }
 
         Object obj = this.getField(field);
         if (obj instanceof String) {
             String str = (String) obj;
-            if ("".equals(str))
+            if ("".equals(str)) {
                 return 0;
+            }
             return Double.parseDouble((String) obj);
         }
-        if (obj instanceof Integer)
+        if (obj instanceof Integer) {
             return ((Integer) obj) * 1.0;
-        else if (obj == null)
+        } else if (obj == null) {
             return 0.0;
-        else if (obj instanceof Long) {
+        } else if (obj instanceof BigInteger) {
+            return Double.valueOf(((BigInteger) obj).doubleValue());
+        } else if (obj instanceof Long) {
             Long tmp = (Long) obj;
             return tmp * 1.0;
         } else if ((obj instanceof Boolean)) {
             return (Boolean) obj ? 1 : 0;
         } else {
             double d = (Double) obj;
-            if (d == 0)
+            if (d == 0) {
                 d = 0;
+            }
             return d;
         }
     }
@@ -360,10 +379,12 @@ public class Record implements IRecord, Serializable {
 
     @Override
     public String getString(String field) {
-        if (field == null)
+        if (field == null) {
             throw new RuntimeException("field is null");
-        if (!defs.exists(field))
+        }
+        if (!defs.exists(field)) {
             defs.add(field);
+        }
 
         String result = "";
         Object obj = this.getField(field);
@@ -400,8 +421,9 @@ public class Record implements IRecord, Serializable {
 
     @Override
     public TDateTime getDateTime(String field) {
-        if (!defs.exists(field))
+        if (!defs.exists(field)) {
             defs.add(field);
+        }
 
         Object obj = this.getField(field);
         if (obj == null) {
@@ -466,11 +488,13 @@ public class Record implements IRecord, Serializable {
             for (String field : delta.keySet()) {
                 Object value = items.get(field);
                 Object oldValue = delta.get(field);
-                if (compareValue(value, oldValue))
+                if (compareValue(value, oldValue)) {
                     delList.add(field);
+                }
             }
-            for (String field : delList)
+            for (String field : delList) {
                 delta.remove(field);
+            }
             return delta.size() > 0;
         }
         default:
@@ -484,8 +508,9 @@ public class Record implements IRecord, Serializable {
             String value = obj1 == null ? "null" : obj1.toString();
             Object obj2 = values.get(field);
             String compareValue = obj2 == null ? "null" : obj2.toString();
-            if (!value.equals(compareValue))
+            if (!value.equals(compareValue)) {
                 return false;
+            }
         }
         return true;
     }
