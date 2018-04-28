@@ -14,7 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -22,7 +23,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 
 public class Record implements IRecord, Serializable {
-    private static final Logger log = Logger.getLogger(Record.class);
+    private static final Logger log = LoggerFactory.getLogger(Record.class);
 
     private static final long serialVersionUID = 4454304132898734723L;
     private DataSetState state = DataSetState.dsNone;
