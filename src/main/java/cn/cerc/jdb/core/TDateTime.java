@@ -35,6 +35,7 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
         map.put("YYYY/MM/DD", "yyyy/MM/dd");
 
         dateFormats.put("yyyy-MM-dd HH:mm:ss", "\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}");
+        dateFormats.put("yyyy-MM-dd HH:mm", "\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}");
         dateFormats.put("yyyy-MM-dd", "\\d{4}-\\d{2}-\\d{2}");
         dateFormats.put("yyyy/MM/dd HH:mm:ss", "\\d{4}/\\d{2}/\\d{2}\\s\\d{2}:\\d{2}:\\d{2}");
         dateFormats.put("yyyy/MM/dd", "\\d{4}/\\d{2}/\\d{2}");
@@ -87,6 +88,10 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
 
     public String getYearMonth() {
         return format("yyyyMM");
+    }
+
+    public String getYear() {
+        return format("yyyy");
     }
 
     public String getFull() {
@@ -214,6 +219,24 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
         return new TDate(this.data);
     }
 
+    public TDateTime incSecond(int value) {
+        TDateTime result = this.clone();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(result.getData());
+        cal.set(Calendar.SECOND, value + cal.get(Calendar.SECOND));
+        result.setData(cal.getTime());
+        return result;
+    }
+
+    public TDateTime incMinute(int value) {
+        TDateTime result = this.clone();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(result.getData());
+        cal.set(Calendar.MINUTE, value + cal.get(Calendar.MINUTE));
+        result.setData(cal.getTime());
+        return result;
+    }
+
     public TDateTime incHour(int value) {
         TDateTime result = this.clone();
         Calendar cal = Calendar.getInstance();
@@ -313,6 +336,20 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
         Calendar cal = Calendar.getInstance();
         cal.setTime(this.data);
         return cal.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public int getHours() {
+        // 返回value的小时值
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.data);
+        return cal.get(Calendar.HOUR_OF_DAY);
+    }
+
+    public int getMinutes() {
+        // 返回value的分钟值
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(this.data);
+        return cal.get(Calendar.MINUTE);
     }
 
     // 返回农历日期

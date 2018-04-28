@@ -3,6 +3,8 @@
  */
 package cn.cerc.jdb.core;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,8 +31,10 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
     }
 
     public CustomDataSet append(int index) {
-        if (search != null)
+        if (search != null) {
             search.clear();
+        }
+
         Record record = new Record(this.fieldDefs);
         record.setDataSet(this);
         record.setState(DataSetState.dsInsert);
@@ -42,8 +46,9 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
             this.records.add(index, record);
             recNo = index + 1;
         }
-        if (onAfterAppend != null)
+        if (onAfterAppend != null) {
             onAfterAppend.execute(this);
+        }
         return this;
     }
 
@@ -196,6 +201,7 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
         return this.getCurrent().getState();
     }
 
+    @Override
     public Object getField(String field) {
         return this.getCurrent().getField(field);
     }
@@ -259,6 +265,16 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
     @Override
     public int getInt(String field) {
         return this.getCurrent().getInt(field);
+    }
+
+    @Override
+    public BigInteger getBigInteger(String field) {
+        return this.getCurrent().getBigInteger(field);
+    }
+
+    @Override
+    public BigDecimal getBigDecimal(String field) {
+        return this.getCurrent().getBigDecimal(field);
     }
 
     @Override
@@ -382,4 +398,5 @@ public class CustomDataSet implements IRecord, Iterable<Record> {
     public void setOnBeforePost(DataSetEvent onBeforePost) {
         this.onBeforePost = onBeforePost;
     }
+
 }

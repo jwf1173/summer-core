@@ -49,21 +49,21 @@ public class DataSet extends CustomDataSet implements Serializable {
     }
 
     public String getJSON(int beginLine, int endLine) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder builder = new StringBuilder();
 
-        buffer.append("{");
+        builder.append("{");
         if (head != null) {
             if (head.size() > 0) {
-                buffer.append("\"head\":").append(head.toString());
+                builder.append("\"head\":").append(head.toString());
             }
             if (head.size() > 0 && this.size() > 0) {
-                buffer.append(",");
+                builder.append(",");
             }
         }
         if (this.size() > 0) {
             List<String> fields = this.getFieldDefs().getFields();
             Gson gson = new Gson();
-            buffer.append("\"dataset\":[").append(gson.toJson(fields));
+            builder.append("\"dataset\":[").append(gson.toJson(fields));
             for (int i = 0; i < this.size(); i++) {
                 Record record = this.getRecords().get(i);
                 if (i < beginLine || i > endLine)
@@ -81,13 +81,13 @@ public class DataSet extends CustomDataSet implements Serializable {
                     else
                         tmp2.put(field, obj);
                 }
-                buffer.append(",").append(gson.toJson(tmp2.values()).toString());
+                builder.append(",").append(gson.toJson(tmp2.values()).toString());
             }
-            buffer.append("]");
+            builder.append("]");
         }
-        buffer.append("}");
+        builder.append("}");
         // Logger.debug(getClass(),"getJson == "+ buffer.toString());
-        return buffer.toString();
+        return builder.toString();
     }
 
     public boolean setJSON(String json) {

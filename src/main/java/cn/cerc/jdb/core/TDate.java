@@ -13,7 +13,7 @@ import java.util.Date;
 public class TDate extends TDateTime {
     private static final long serialVersionUID = 1L;
 
-    public TDate(java.util.Date date) {
+    public TDate(Date date) {
         this.setData(date);
     }
 
