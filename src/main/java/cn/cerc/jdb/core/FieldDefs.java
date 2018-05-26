@@ -64,4 +64,10 @@ public class FieldDefs implements Serializable, Iterable<String> {
     public void setLocked(boolean locked) {
         this.locked = locked;
     }
+
+    public void delete(String field) {
+        int index = fields.indexOf(field);
+        if (index != -1)
+            fields.remove(index);
+    }
 }

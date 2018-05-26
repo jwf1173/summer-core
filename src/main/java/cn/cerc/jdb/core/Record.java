@@ -516,6 +516,13 @@ public class Record implements IRecord, Serializable {
         return true;
     }
 
+    public void delete(String field) {
+        delta.remove(field);
+        items.remove(field);
+        if (defs != null)
+            defs.delete(field);
+    }
+
     public static void main(String[] args) {
         Record record = new Record();
         // record.getFieldDefs().add("num", new DoubleField(18, 4));
@@ -540,5 +547,11 @@ public class Record implements IRecord, Serializable {
             System.out.println("num old: " + record.getOldField("num"));
             System.out.println("num new: " + record.getField("num"));
         }
+        System.out.println(record);
+        record.delete("num2");
+        record.getFieldDefs().add("num3");
+        System.out.println(record);
+        record.delete("num3");
+        System.out.println(record);
     }
 }
