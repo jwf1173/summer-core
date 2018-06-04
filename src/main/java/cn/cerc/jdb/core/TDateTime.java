@@ -274,6 +274,64 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
         return result;
     }
 
+    /**
+     * 计算时间是否到期(精确到秒)
+     * 
+     * @param startTime
+     *            起始时间
+     * @param endTime
+     *            截止时间
+     */
+    public static boolean isTimeOut(TDateTime startTime, TDateTime endTime) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        // 一天的毫秒数
+        long nd = 1000 * 24 * 60 * 60;
+
+        // 一小时的毫秒数
+        long nh = 1000 * 60 * 60;
+
+        // 一分钟的毫秒数
+        long nm = 1000 * 60;
+
+        // 一秒钟的毫秒数
+        long ns = 1000;
+
+        long diff;
+        long day = 0;
+        long hour = 0;
+        long min = 0;
+        long sec = 0;
+        try {
+            // 计算时间差
+            diff = dateFormat.parse(endTime.toString()).getTime() - dateFormat.parse(startTime.toString()).getTime();
+            day = diff / nd;// 计算差多少天
+            hour = diff % nd / nh + day * 24;// 计算差多少小时
+            min = diff % nd % nh / nm + day * 24 * 60;// 计算差多少分钟
+            sec = diff % nd % nh % nm / ns;// 计算差多少秒
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // 天数
+        if (day > 0) {
+            return true;
+        }
+
+        // 小时
+        if (hour - day * 24 > 0) {
+            return true;
+        }
+
+        // 分
+        if (min - day * 24 * 60 > 0) {
+            return true;
+        }
+
+        // 秒
+        return sec - day > 0;
+    }
+
     @Deprecated
     public TDateTime addDay(int value) {
         return this.incDay(value);
