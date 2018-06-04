@@ -35,4 +35,29 @@ public class Utils {
         return objIn.readObject();
     }
 
+    public static String encode(Object obj) {
+        if (obj == null)
+            return null;
+        try {
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
+            objOut.writeObject(obj);
+            return byteOut.toString("ISO-8859-1");// 此处只能是ISO-8859-1,但是不会影响中文使用;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Object decode(String str) {
+        if (str == null)
+            return null;
+        try {
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(str.getBytes("ISO-8859-1"));
+            ObjectInputStream objIn = new ObjectInputStream(byteIn);
+            return objIn.readObject();
+        } catch (ClassNotFoundException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
