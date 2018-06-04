@@ -19,6 +19,8 @@ public class Utils {
     }
 
     public static String serializeToString(Object obj) throws IOException {
+        if (obj == null)
+            return null;
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
         objOut.writeObject(obj);
@@ -26,6 +28,8 @@ public class Utils {
     }
 
     public static Object deserializeToObject(String str) throws IOException, ClassNotFoundException {
+        if (str == null)
+            return null;
         ByteArrayInputStream byteIn = new ByteArrayInputStream(str.getBytes("ISO-8859-1"));
         ObjectInputStream objIn = new ObjectInputStream(byteIn);
         return objIn.readObject();
