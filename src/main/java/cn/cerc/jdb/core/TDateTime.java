@@ -115,6 +115,45 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
         this.data = data;
     }
 
+    public long compareSecond(TDateTime startTime) {
+        if (startTime == null) {
+            return 0;
+        }
+
+        // 一秒的毫秒数
+        long second = 1000;
+
+        long start = startTime.getData().getTime();
+        long end = TDateTime.Now().getData().getTime();
+        return (end - start) / second;
+    }
+
+    public long compareMinute(TDateTime startTime) {
+        if (startTime == null) {
+            return 0;
+        }
+
+        // 一分钟的毫秒数
+        long minute = 1000 * 60;
+
+        long start = startTime.getData().getTime();
+        long end = TDateTime.Now().getData().getTime();
+        return (end - start) / minute;
+    }
+
+    public long compareHour(TDateTime startTime) {
+        if (startTime == null) {
+            return 0;
+        }
+
+        // 一小时的毫秒数
+        long hour = 1000 * 60 * 60;
+
+        long start = startTime.getData().getTime();
+        long end = TDateTime.Now().getData().getTime();
+        return (end - start) / hour;
+    }
+
     // 若当前值大，则返回正数，否则返回负数
     public int compareDay(TDateTime dateFrom) {
         if (dateFrom == null)
@@ -277,10 +316,8 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
     /**
      * 计算时间是否到期(精确到秒)
      * 
-     * @param startTime
-     *            起始时间
-     * @param endTime
-     *            截止时间
+     * @param startTime 起始时间
+     * @param endTime   截止时间
      */
     public static boolean isTimeOut(TDateTime startTime, TDateTime endTime) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
