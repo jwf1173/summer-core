@@ -4,10 +4,11 @@ import java.util.ArrayList;
 
 public class SqlText {
     // 从数据库每次加载的最大笔数
-    private int batchSize = 50000;
+    public static final int MAX_RECORDS = 50000;
+    private int maximum = MAX_RECORDS;
     private int offset = 0;
     // sql 指令
-    private String sqlText;
+    private String text;
 
     public SqlText() {
 
@@ -24,10 +25,10 @@ public class SqlText {
     public SqlText add(String sql) {
         if (sql == null)
             throw new RuntimeException("sql not is null");
-        if (sqlText == null)
-            sqlText = sql;
+        if (text == null)
+            text = sql;
         else
-            sqlText = sqlText + " " + sql;
+            text = text + " " + sql;
         return this;
     }
 
@@ -48,16 +49,16 @@ public class SqlText {
     }
 
     public String getSelect(int offset) {
-        String sql = this.sqlText;
+        String sql = this.text;
         if (sql == null || sql.equals(""))
             throw new RuntimeException("[SqlText]CommandText is null ！");
 
-        sql = sql + String.format(" limit %d,%d", offset, this.batchSize);
+        sql = sql + String.format(" limit %d,%d", offset, this.maximum);
         return sql;
     }
 
     public SqlText clear() {
-        this.sqlText = null;
+        this.text = null;
         return this;
     }
 
@@ -69,12 +70,41 @@ public class SqlText {
         this.offset = offset;
     }
 
-    public int getBatchSize() {
-        return batchSize;
+    public String getText() {
+        return text;
     }
 
-    public void setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
+    public String getCommand() {
+        String sql = this.getText();
+        if (sql == null || sql.equals(""))
+            throw new RuntimeException("SqlText.text is null ！");
+
+        if (sql.indexOf("call ") > -1)
+            return sql;
+
+        if (this.offset > 0) {
+            if (this.maximum < 0)
+                sql = sql + String.format(" limit %d,%d", this.offset, MAX_RECORDS + 1);
+            else
+                sql = sql + String.format(" limit %d,%d", this.offset, this.maximum + 1);
+        } else if (this.maximum == MAX_RECORDS) {
+            sql = sql + String.format(" limit %d", this.maximum + 2);
+        } else if (this.maximum > -1) {
+            sql = sql + String.format(" limit %d", this.maximum + 1);
+        } else if (this.maximum == 0) {
+            sql = sql + String.format(" limit %d", 0);
+        }
+        return sql;
+    }
+
+    public int getMaximum() {
+        return maximum;
+    }
+
+    public void setMaximum(int maximum) {
+        if (maximum > MAX_RECORDS)
+            throw new RuntimeException(String.format("本次请求的记录数超出了系统最大笔数为  %d 的限制！", MAX_RECORDS));
+        this.maximum = maximum;
     }
 
 }
