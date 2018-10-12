@@ -1,17 +1,84 @@
 package cn.cerc.jdb.core;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
 
 public class SqlText {
+    public static int PUBLIC = 1;
+    public static int PRIVATE = 2;
+    public static int PROTECTED = 4;
     // 从数据库每次加载的最大笔数
     public static final int MAX_RECORDS = 50000;
     private int maximum = MAX_RECORDS;
     private int offset = 0;
     // sql 指令
     private String text;
+    private String tableId = null;
+    private String baseSelect = null;
 
     public SqlText() {
+        super();
+    }
 
+    public SqlText(Class<?> clazz) {
+        super();
+        for (Annotation anno : clazz.getAnnotations()) {
+            if (anno instanceof Entity) {
+                Entity entity = (Entity) anno;
+                if (!"".equals(entity.name()))
+                    tableId = entity.name();
+            }
+            if (anno instanceof Select) {
+                Select obj = (Select) anno;
+                if (!"".equals(obj.value())) {
+                    baseSelect = obj.value();
+                    this.text = obj.value();
+                }
+            }
+        }
+        if (baseSelect != null) 
+            return;
+
+        if (tableId == null)
+            throw new RuntimeException("entity.name or select not define");
+
+        StringBuffer sb = new StringBuffer();
+        List<String> fieldItems = new ArrayList<>();
+        for (Field field : clazz.getDeclaredFields()) {
+            Column column = null;
+            for (Annotation item : field.getAnnotations()) {
+                if (item instanceof Column) {
+                    column = (Column) item;
+                    break;
+                }
+            }
+            if (column != null) {
+                String fieldCode = field.getName();
+                if (!"".equals(column.name()))
+                    fieldCode = column.name();
+                if (field.getModifiers() == PUBLIC)
+                    fieldItems.add(fieldCode);
+                else if (field.getModifiers() == PRIVATE || field.getModifiers() == PROTECTED) {
+                    field.setAccessible(true);
+                    fieldItems.add(fieldCode);
+                }
+            }
+        }
+
+        sb.append("select ");
+        int count = fieldItems.size();
+        for (int i = 0; i < count; i++) {
+            if (i > 0)
+                sb.append(",");
+            sb.append(fieldItems.get(i));
+        }
+        sb.append(" from ").append(tableId);
+        this.text = sb.toString();
     }
 
     public SqlText(String commandText) {
@@ -107,4 +174,11 @@ public class SqlText {
         this.maximum = maximum;
     }
 
+    public String getTableId() {
+        return tableId;
+    }
+
+    public String getBaseSelect() {
+        return baseSelect;
+    }
 }
