@@ -56,25 +56,20 @@ public abstract class DataQuery extends DataSet {
         return this.add(String.format(format, items.toArray()));
     }
 
-    @Deprecated //请改使用 getSqlText().getText()
+    @Deprecated //请改使用 getSqlText().getText
     public String getCommandText() {
         return this.sqlText.getText();
     }
 
-    public void setSqlText(SqlText sqlText) {
+    protected void setSqlText(SqlText sqlText) {
         this.sqlText = sqlText;
     }
 
-    public SqlText getSqlText() {
+    protected SqlText getSqlText() {
         return this.sqlText;
     }
 
-    /**
-     * 将commandText 置为 null，请改使用 getSqlText().clear();
-     * 
-     * @return 返回自身
-     */
-    @Deprecated
+    @Deprecated //请改使用 getSqlText().clear
     public DataQuery emptyCommand() {
         this.sqlText.clear();
         return this;
