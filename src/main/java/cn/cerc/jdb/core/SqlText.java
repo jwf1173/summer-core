@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 
 public class SqlText {
     public static int PUBLIC = 1;
@@ -20,6 +21,7 @@ public class SqlText {
     private String text;
     private String tableId = null;
     private String baseSelect = null;
+    private Class<?> clazz;
 
     public SqlText() {
         super();
@@ -27,6 +29,7 @@ public class SqlText {
 
     public SqlText(Class<?> clazz) {
         super();
+        this.clazz = clazz;
         for (Annotation anno : clazz.getAnnotations()) {
             if (anno instanceof Entity) {
                 Entity entity = (Entity) anno;
@@ -41,7 +44,7 @@ public class SqlText {
                 }
             }
         }
-        if (baseSelect != null) 
+        if (baseSelect != null)
             return;
 
         if (tableId == null)
@@ -116,10 +119,10 @@ public class SqlText {
         return getSelect(this.offset);
     }
 
-    public String getSelect(int offset) {
+    protected String getSelect(int offset) {
         String sql = this.text;
         if (sql == null || sql.equals(""))
-            throw new RuntimeException("[SqlText]CommandText is null ！");
+            throw new RuntimeException("SqlText.Text is null ！");
 
         sql = sql + String.format(" limit %d,%d", offset, this.maximum);
         return sql;
@@ -182,4 +185,74 @@ public class SqlText {
     public String getBaseSelect() {
         return baseSelect;
     }
+
+    public String getWhere(String whereText) {
+        StringBuffer sql = new StringBuffer(this.baseSelect);
+        sql.append(" " + whereText);
+        return sql.toString();
+    }
+
+    public String getWhereKeys(Object... values) {
+        StringBuffer sql = new StringBuffer(this.baseSelect);
+        addWhere(sql, values);
+        return sql.toString();
+    }
+
+    private void addWhere(StringBuffer sql, Object... values) {
+        if (values.length == 0)
+            throw new RuntimeException("values is null");
+
+        List<String> idList = getIdList();
+        if (idList.size() == 0)
+            throw new RuntimeException("id is null");
+
+        if (idList.size() != values.length)
+            throw new RuntimeException(String.format("ids.size(%s) != values.size(%s)", idList.size(), values.length));
+
+        int i = 0;
+        int count = idList.size();
+        if (count > 0)
+            sql.append(" where");
+        for (String fieldCode : idList) {
+            Object value = values[i];
+            sql.append(i > 0 ? " and " : " ");
+            if (value == null)
+                sql.append(String.format("%s is null", fieldCode));
+            if (value instanceof String) {
+                sql.append(String.format("%s='%s'", fieldCode, Utils.safeString((String) value)));
+            } else {
+                sql.append(String.format("%s='%s'", fieldCode, value));
+            }
+            i++;
+        }
+    }
+
+    private List<String> getIdList() {
+        List<String> idList = new ArrayList<>();
+        for (Field field : clazz.getDeclaredFields()) {
+            Column column = null;
+            boolean isId = false;
+            for (Annotation item : field.getAnnotations()) {
+                if (item instanceof Column) {
+                    column = (Column) item;
+                    break;
+                }
+            }
+            for (Annotation item : field.getAnnotations()) {
+                if (item instanceof Id) {
+                    isId = true;
+                    break;
+                }
+            }
+            if (column != null) {
+                String fieldCode = field.getName();
+                if (!"".equals(column.name()))
+                    fieldCode = column.name();
+                if (isId)
+                    idList.add(fieldCode);
+            }
+        }
+        return idList;
+    }
+
 }
