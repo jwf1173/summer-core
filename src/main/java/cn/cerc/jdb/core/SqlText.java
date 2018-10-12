@@ -78,6 +78,7 @@ public class SqlText {
             sb.append(fieldItems.get(i));
         }
         sb.append(" from ").append(tableId);
+        this.baseSelect = sb.toString();
         this.text = sb.toString();
     }
 
