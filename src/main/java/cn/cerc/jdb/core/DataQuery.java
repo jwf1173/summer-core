@@ -39,12 +39,12 @@ public abstract class DataQuery extends DataSet {
      *            要增加的sql指令内容
      * @return 返回对象本身
      */
-    public DataQuery add(String sql) {
+    protected DataQuery add(String sql) {
         sqlText.add(sql);
         return this;
     }
 
-    public DataQuery add(String format, Object... args) {
+    protected DataQuery add(String format, Object... args) {
         ArrayList<Object> items = new ArrayList<>();
         for (Object arg : args) {
             if (arg instanceof String) {
