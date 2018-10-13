@@ -2,13 +2,16 @@ package cn.cerc.jdb.core;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 public class ClassData {
     public static final int PUBLIC = 1;
@@ -19,7 +22,8 @@ public class ClassData {
     private String select = null;
     private Map<String, Field> fields = null;
     private Field generationIdentityField = null;
-    private String uid = "UID_";
+    private String updateKey = "UID_";
+    private List<String> searchKeys = new ArrayList<>();
 
     public ClassData(Class<?> clazz) {
         this.clazz = clazz;
@@ -37,9 +41,6 @@ public class ClassData {
             }
         }
 
-        if (tableId == null)
-            throw new RuntimeException("entity.name or select not define");
-
         this.fields = loadFields();
 
         if (select == null) {
@@ -55,10 +56,28 @@ public class ClassData {
             sb.append(" from ").append(tableId);
             select = sb.toString();
         }
-        
-        //查找自增字段并赋值
+
+        if (tableId == null) {
+            String[] items = select.split("[ \r\n]");
+            for (int i = 0; i < items.length; i++) {
+                if (items[i].toLowerCase().contains("from")) {
+                    // 如果取到form后 下一个记录为数据库表名
+                    while (items[i + 1] == null || "".equals(items[i + 1].trim())) {
+                        // 防止取到空值
+                        i++;
+                    }
+                    tableId = items[++i]; // 获取数据库表名
+                    break;
+                }
+            }
+
+            if (tableId == null)
+                throw new RuntimeException("entity.name or select not define");
+        }
+
+        // 查找自增字段并赋值
         int count = 0;
-        for(String key : fields.keySet()) {
+        for (String key : fields.keySet()) {
             Field field = fields.get(key);
             for (Annotation item : field.getAnnotations()) {
                 if (item instanceof GeneratedValue) {
@@ -67,13 +86,14 @@ public class ClassData {
                         count++;
                     }
                 }
-                if (item instanceof UID) {
-                    uid = field.getName();
-                }
+                if (item instanceof UpdateKey)
+                    updateKey = key;
+                if (item instanceof Id)
+                    searchKeys.add(key);
             }
         }
-        
-        if(count > 1)
+
+        if (count > 1)
             throw new RuntimeException("support one generationIdentityField!");
     }
 
@@ -103,6 +123,10 @@ public class ClassData {
         return fields;
     }
 
+    public List<String> getSearchKeys() {
+        return searchKeys;
+    }
+
     public Class<?> getClazz() {
         return clazz;
     }
@@ -123,7 +147,7 @@ public class ClassData {
         return generationIdentityField;
     }
 
-    public String getUid() {
-        return uid;
+    public String getUpdateKey() {
+        return updateKey;
     }
 }

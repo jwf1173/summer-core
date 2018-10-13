@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
-public @interface UID {
-    String value() default "";
+public @interface UpdateKey {
+//    String value() default "";
 }

@@ -1,13 +1,7 @@
 package cn.cerc.jdb.core;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 public class SqlText {
     public static int PUBLIC = 1;
@@ -19,9 +13,7 @@ public class SqlText {
     private int offset = 0;
     // sql 指令
     private String text;
-    private String tableId = null;
-    private String baseSelect = null;
-    private Class<?> clazz;
+    private ClassData classData;
 
     public SqlText() {
         super();
@@ -29,60 +21,10 @@ public class SqlText {
 
     public SqlText(Class<?> clazz) {
         super();
-        this.clazz = clazz;
-        for (Annotation anno : clazz.getAnnotations()) {
-            if (anno instanceof Entity) {
-                Entity entity = (Entity) anno;
-                if (!"".equals(entity.name()))
-                    tableId = entity.name();
-            }
-            if (anno instanceof Select) {
-                Select obj = (Select) anno;
-                if (!"".equals(obj.value())) {
-                    baseSelect = obj.value();
-                    this.text = obj.value();
-                }
-            }
-        }
-        if (baseSelect != null)
-            return;
-
-        if (tableId == null)
+        classData = ClassFactory.get(clazz);
+        if (classData.getTableId() == null)
             throw new RuntimeException("entity.name or select not define");
-
-        StringBuffer sb = new StringBuffer();
-        List<String> fieldItems = new ArrayList<>();
-        for (Field field : clazz.getDeclaredFields()) {
-            Column column = null;
-            for (Annotation item : field.getAnnotations()) {
-                if (item instanceof Column) {
-                    column = (Column) item;
-                    break;
-                }
-            }
-            if (column != null) {
-                String fieldCode = field.getName();
-                if (!"".equals(column.name()))
-                    fieldCode = column.name();
-                if (field.getModifiers() == PUBLIC)
-                    fieldItems.add(fieldCode);
-                else if (field.getModifiers() == PRIVATE || field.getModifiers() == PROTECTED) {
-                    field.setAccessible(true);
-                    fieldItems.add(fieldCode);
-                }
-            }
-        }
-
-        sb.append("select ");
-        int count = fieldItems.size();
-        for (int i = 0; i < count; i++) {
-            if (i > 0)
-                sb.append(",");
-            sb.append(fieldItems.get(i));
-        }
-        sb.append(" from ").append(tableId);
-        this.baseSelect = sb.toString();
-        this.text = sb.toString();
+        this.text = classData.getSelect();
     }
 
     public SqlText(String commandText) {
@@ -179,21 +121,21 @@ public class SqlText {
     }
 
     public String getTableId() {
-        return tableId;
-    }
-
-    public String getBaseSelect() {
-        return baseSelect;
+        return classData != null ? classData.getTableId() : null;
     }
 
     public String getWhere(String whereText) {
-        StringBuffer sql = new StringBuffer(this.baseSelect);
+        if (classData == null)
+            throw new RuntimeException("classData is null");
+        StringBuffer sql = new StringBuffer(classData.getSelect());
         sql.append(" " + whereText);
         return sql.toString();
     }
 
     public String getWhereKeys(Object... values) {
-        StringBuffer sql = new StringBuffer(this.baseSelect);
+        if (classData == null)
+            throw new RuntimeException("classData is null");
+        StringBuffer sql = new StringBuffer(classData.getSelect());
         addWhere(sql, values);
         return sql.toString();
     }
@@ -202,7 +144,9 @@ public class SqlText {
         if (values.length == 0)
             throw new RuntimeException("values is null");
 
-        List<String> idList = getIdList();
+        if (classData == null)
+            throw new RuntimeException("classData is null");
+        List<String> idList = classData.getSearchKeys();
         if (idList.size() == 0)
             throw new RuntimeException("id is null");
 
@@ -227,32 +171,8 @@ public class SqlText {
         }
     }
 
-    private List<String> getIdList() {
-        List<String> idList = new ArrayList<>();
-        for (Field field : clazz.getDeclaredFields()) {
-            Column column = null;
-            boolean isId = false;
-            for (Annotation item : field.getAnnotations()) {
-                if (item instanceof Column) {
-                    column = (Column) item;
-                    break;
-                }
-            }
-            for (Annotation item : field.getAnnotations()) {
-                if (item instanceof Id) {
-                    isId = true;
-                    break;
-                }
-            }
-            if (column != null) {
-                String fieldCode = field.getName();
-                if (!"".equals(column.name()))
-                    fieldCode = column.name();
-                if (isId)
-                    idList.add(fieldCode);
-            }
-        }
-        return idList;
+    public ClassData getClassData() {
+        return classData;
     }
 
 }

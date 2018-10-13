@@ -22,9 +22,12 @@ public class ClassFactory {
 
     public static void printDebugInfo(Class<?> clazz) {
         ClassData data = ClassFactory.get(clazz);
-        System.out.println("select:" + data.getSelect());
         System.out.println("tableId:" + data.getTableId());
-        System.out.println("uid:" + data.getUid());
+        System.out.println("select:" + data.getSelect());
+        System.out.println();
+        System.out.println("updateKey:" + data.getUpdateKey());
+        for(String key : data.getSearchKeys()) 
+            System.out.println("serachKey:" + key);
         Field field = data.getGenerationIdentityField();
         if (field != null)
             System.out.println("generationIdentityField:" + field.getName());
