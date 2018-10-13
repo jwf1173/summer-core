@@ -96,6 +96,9 @@ public class ClassData {
 
         if (count > 1)
             throw new RuntimeException("support one generationIdentityField!");
+
+        if (searchKeys.size() == 0)
+            searchKeys.add(updateKey);
     }
 
     private Map<String, Field> loadFields() {
