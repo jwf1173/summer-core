@@ -46,7 +46,7 @@ public class ClassData {
         if (tableId == null && select == null)
             throw new RuntimeException("entity.name or select not define");
 
-        else if (select == null) {
+        if (select == null) {
             StringBuffer sb = new StringBuffer();
             sb.append("select ");
             int i = 0;
