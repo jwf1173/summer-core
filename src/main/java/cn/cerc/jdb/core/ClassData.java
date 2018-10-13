@@ -43,10 +43,10 @@ public class ClassData {
 
         this.fields = loadFields();
 
-        if (select == null) {
-            if (tableId == null)
-                throw new RuntimeException("entity.name or select not define");
+        if (tableId == null && select == null)
+            throw new RuntimeException("entity.name or select not define");
 
+        else if (select == null) {
             StringBuffer sb = new StringBuffer();
             sb.append("select ");
             int i = 0;
@@ -58,9 +58,7 @@ public class ClassData {
             }
             sb.append(" from ").append(tableId);
             select = sb.toString();
-        }
-
-        if (tableId == null) {
+        } else if (tableId == null) {
             String[] items = select.split("[ \r\n]");
             for (int i = 0; i < items.length; i++) {
                 if (items[i].toLowerCase().contains("from")) {
