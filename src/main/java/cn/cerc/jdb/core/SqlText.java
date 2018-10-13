@@ -1,12 +1,7 @@
 package cn.cerc.jdb.core;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
 
 public class SqlText {
     public static int PUBLIC = 1;
@@ -18,8 +13,7 @@ public class SqlText {
     private int offset = 0;
     // sql 指令
     private String text;
-    private String tableId = null;
-    private String baseSelect = null;
+    private ClassData classData;
 
     public SqlText() {
         super();
@@ -27,59 +21,10 @@ public class SqlText {
 
     public SqlText(Class<?> clazz) {
         super();
-        for (Annotation anno : clazz.getAnnotations()) {
-            if (anno instanceof Entity) {
-                Entity entity = (Entity) anno;
-                if (!"".equals(entity.name()))
-                    tableId = entity.name();
-            }
-            if (anno instanceof Select) {
-                Select obj = (Select) anno;
-                if (!"".equals(obj.value())) {
-                    baseSelect = obj.value();
-                    this.text = obj.value();
-                }
-            }
-        }
-        if (baseSelect != null) 
-            return;
-
-        if (tableId == null)
+        classData = ClassFactory.get(clazz);
+        if (classData.getTableId() == null)
             throw new RuntimeException("entity.name or select not define");
-
-        StringBuffer sb = new StringBuffer();
-        List<String> fieldItems = new ArrayList<>();
-        for (Field field : clazz.getDeclaredFields()) {
-            Column column = null;
-            for (Annotation item : field.getAnnotations()) {
-                if (item instanceof Column) {
-                    column = (Column) item;
-                    break;
-                }
-            }
-            if (column != null) {
-                String fieldCode = field.getName();
-                if (!"".equals(column.name()))
-                    fieldCode = column.name();
-                if (field.getModifiers() == PUBLIC)
-                    fieldItems.add(fieldCode);
-                else if (field.getModifiers() == PRIVATE || field.getModifiers() == PROTECTED) {
-                    field.setAccessible(true);
-                    fieldItems.add(fieldCode);
-                }
-            }
-        }
-
-        sb.append("select ");
-        int count = fieldItems.size();
-        for (int i = 0; i < count; i++) {
-            if (i > 0)
-                sb.append(",");
-            sb.append(fieldItems.get(i));
-        }
-        sb.append(" from ").append(tableId);
-        this.baseSelect = sb.toString();
-        this.text = sb.toString();
+        this.text = classData.getSelect();
     }
 
     public SqlText(String commandText) {
@@ -116,10 +61,10 @@ public class SqlText {
         return getSelect(this.offset);
     }
 
-    public String getSelect(int offset) {
+    protected String getSelect(int offset) {
         String sql = this.text;
         if (sql == null || sql.equals(""))
-            throw new RuntimeException("[SqlText]CommandText is null ！");
+            throw new RuntimeException("SqlText.Text is null ！");
 
         sql = sql + String.format(" limit %d,%d", offset, this.maximum);
         return sql;
@@ -176,10 +121,58 @@ public class SqlText {
     }
 
     public String getTableId() {
-        return tableId;
+        return classData != null ? classData.getTableId() : null;
     }
 
-    public String getBaseSelect() {
-        return baseSelect;
+    public String getWhere(String whereText) {
+        if (classData == null)
+            throw new RuntimeException("classData is null");
+        StringBuffer sql = new StringBuffer(classData.getSelect());
+        sql.append(" " + whereText);
+        return sql.toString();
     }
+
+    public String getWhereKeys(Object... values) {
+        if (classData == null)
+            throw new RuntimeException("classData is null");
+        StringBuffer sql = new StringBuffer(classData.getSelect());
+        addWhere(sql, values);
+        return sql.toString();
+    }
+
+    private void addWhere(StringBuffer sql, Object... values) {
+        if (values.length == 0)
+            throw new RuntimeException("values is null");
+
+        if (classData == null)
+            throw new RuntimeException("classData is null");
+        List<String> idList = classData.getSearchKeys();
+        if (idList.size() == 0)
+            throw new RuntimeException("id is null");
+
+        if (idList.size() != values.length)
+            throw new RuntimeException(String.format("ids.size(%s) != values.size(%s)", idList.size(), values.length));
+
+        int i = 0;
+        int count = idList.size();
+        if (count > 0)
+            sql.append(" where");
+        for (String fieldCode : idList) {
+            Object value = values[i];
+            sql.append(i > 0 ? " and " : " ");
+            if (value == null)
+                sql.append(String.format("%s is null", fieldCode));
+            if (value instanceof String) {
+                sql.append(String.format("%s='%s'", fieldCode, Utils.safeString((String) value)));
+            } else {
+                sql.append(String.format("%s='%s'", fieldCode, value));
+            }
+            i++;
+        }
+    }
+
+    public ClassData getClassData() {
+        return classData;
+    }
+
 }
