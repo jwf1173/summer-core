@@ -44,6 +44,9 @@ public class ClassData {
         this.fields = loadFields();
 
         if (select == null) {
+            if (tableId == null)
+                throw new RuntimeException("entity.name or select not define");
+
             StringBuffer sb = new StringBuffer();
             sb.append("select ");
             int i = 0;
