@@ -6,19 +6,19 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-@Entity
-//@Select("select * from s_userInfo")
+@Entity(name = "s_user")
+@Select("select * from s_userInfo")
 public class StubUser {
 
-    @Column(name="ID_")
-    @UpdateKey
+    @Id
+    @Column(name = "ID_")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Id
+    @SearchKey
     @Column(name = "code_")
     private String code;
-    
+
     @Column(name = "name_")
     private String name;
 

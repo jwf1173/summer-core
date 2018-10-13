@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 
 @Target({ METHOD, FIELD })
 @Retention(RUNTIME)
-public @interface UpdateKey {
+public @interface SearchKey {
 //    String value() default "";
 }

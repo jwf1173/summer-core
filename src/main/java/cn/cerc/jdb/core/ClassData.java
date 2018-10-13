@@ -53,10 +53,10 @@ public class ClassData {
             for (String key : fields.keySet()) {
                 if (i > 0)
                     sb.append(",");
-                sb.append(key);
+                sb.append("`" + key + "`");
                 i++;
             }
-            sb.append(" from ").append(tableId);
+            sb.append(" from ").append("`" + tableId + "`");
             select = sb.toString();
         } else if (tableId == null) {
             String[] items = select.split("[ \r\n]");
@@ -87,9 +87,9 @@ public class ClassData {
                         count++;
                     }
                 }
-                if (item instanceof UpdateKey)
-                    updateKey = key;
                 if (item instanceof Id)
+                    updateKey = key;
+                if (item instanceof SearchKey)
                     searchKeys.add(key);
             }
         }
