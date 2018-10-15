@@ -57,16 +57,17 @@ public class SqlText {
         return this.add(String.format(format, items.toArray()));
     }
 
+    @Deprecated // 请改使用getTextByLimit
     public String getSelect() {
-        return getSelect(this.offset);
+        return getTextByLimit();
     }
 
-    protected String getSelect(int offset) {
+    public String getTextByLimit() {
         String sql = this.text;
         if (sql == null || sql.equals(""))
             throw new RuntimeException("SqlText.Text is null ！");
 
-        sql = sql + String.format(" limit %d,%d", offset, this.maximum);
+        sql = sql + String.format(" limit %d,%d", this.offset, this.maximum);
         return sql;
     }
 
@@ -124,20 +125,20 @@ public class SqlText {
         return classData != null ? classData.getTableId() : null;
     }
 
-    @Deprecated //请改使用 add(whereText).getCommand()
+    @Deprecated // 请改使用 add(whereText).getText()
     public String getWhere(String whereText) {
-        return add(whereText).getCommand();
+        return add(whereText).getText();
     }
 
-    @Deprecated //请改使用 addWhereKeys(values).getCommand()
+    @Deprecated // 请改使用 addWhereKeys(values).getText()
     public String getWhereKeys(Object... values) {
-        return addWhereKeys(values).getCommand();
+        return addWhereKeys(values).getText();
     }
 
     public SqlText addWhereKeys(Object... values) {
         if (values.length == 0)
             throw new RuntimeException("values is null");
-        
+
         if (classData == null)
             throw new RuntimeException("classData is null");
 
@@ -152,7 +153,7 @@ public class SqlText {
         int i = 0;
         int count = idList.size();
         if (count > 0)
-            sb.append(" where");
+            sb.append("where");
         for (String fieldCode : idList) {
             Object value = values[i];
             sb.append(i > 0 ? " and " : " ");
@@ -165,7 +166,7 @@ public class SqlText {
             }
             i++;
         }
-        
+
         return add(sb.toString());
     }
 
