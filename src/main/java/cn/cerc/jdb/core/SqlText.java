@@ -126,35 +126,22 @@ public class SqlText {
 
     @Deprecated //请改使用 add(whereText).getCommand()
     public String getWhere(String whereText) {
-        if (classData == null)
-            throw new RuntimeException("classData is null");
-        StringBuffer sql = new StringBuffer(classData.getSelect());
-        sql.append(" " + whereText);
-        return sql.toString();
+        return add(whereText).getCommand();
     }
 
     @Deprecated //请改使用 addWhereKeys(values).getCommand()
     public String getWhereKeys(Object... values) {
-        if (classData == null)
-            throw new RuntimeException("classData is null");
-        StringBuffer sql = new StringBuffer(classData.getSelect());
-        addWhere(sql, values);
-        return sql.toString();
+        return addWhereKeys(values).getCommand();
     }
 
     public SqlText addWhereKeys(Object... values) {
-        StringBuffer sql = new StringBuffer();
-        addWhere(sql, values);
-        add(sql.toString());
-        return this;
-    }
-
-    private void addWhere(StringBuffer sql, Object... values) {
         if (values.length == 0)
             throw new RuntimeException("values is null");
-
+        
         if (classData == null)
             throw new RuntimeException("classData is null");
+
+        StringBuffer sb = new StringBuffer();
         List<String> idList = classData.getSearchKeys();
         if (idList.size() == 0)
             throw new RuntimeException("id is null");
@@ -165,19 +152,21 @@ public class SqlText {
         int i = 0;
         int count = idList.size();
         if (count > 0)
-            sql.append(" where");
+            sb.append(" where");
         for (String fieldCode : idList) {
             Object value = values[i];
-            sql.append(i > 0 ? " and " : " ");
+            sb.append(i > 0 ? " and " : " ");
             if (value == null)
-                sql.append(String.format("%s is null", fieldCode));
+                sb.append(String.format("%s is null", fieldCode));
             if (value instanceof String) {
-                sql.append(String.format("%s='%s'", fieldCode, Utils.safeString((String) value)));
+                sb.append(String.format("%s='%s'", fieldCode, Utils.safeString((String) value)));
             } else {
-                sql.append(String.format("%s='%s'", fieldCode, value));
+                sb.append(String.format("%s='%s'", fieldCode, value));
             }
             i++;
         }
+        
+        return add(sb.toString());
     }
 
     public ClassData getClassData() {
