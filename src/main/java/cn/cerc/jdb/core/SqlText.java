@@ -35,13 +35,13 @@ public class SqlText {
         add(format, args);
     }
 
-    public SqlText add(String sql) {
-        if (sql == null)
-            throw new RuntimeException("sql not is null");
+    public SqlText add(String text) {
         if (text == null)
-            text = sql;
+            throw new RuntimeException("sql not is null");
+        if (this.text == null)
+            this.text = text;
         else
-            text = text + " " + sql;
+            this.text = this.text + " " + text;
         return this;
     }
 
@@ -124,6 +124,7 @@ public class SqlText {
         return classData != null ? classData.getTableId() : null;
     }
 
+    @Deprecated //请改使用 add(whereText).getCommand()
     public String getWhere(String whereText) {
         if (classData == null)
             throw new RuntimeException("classData is null");
@@ -132,12 +133,20 @@ public class SqlText {
         return sql.toString();
     }
 
+    @Deprecated //请改使用 addWhereKeys(values).getCommand()
     public String getWhereKeys(Object... values) {
         if (classData == null)
             throw new RuntimeException("classData is null");
         StringBuffer sql = new StringBuffer(classData.getSelect());
         addWhere(sql, values);
         return sql.toString();
+    }
+
+    public SqlText addWhereKeys(Object... values) {
+        StringBuffer sql = new StringBuffer();
+        addWhere(sql, values);
+        add(sql.toString());
+        return this;
     }
 
     private void addWhere(StringBuffer sql, Object... values) {
