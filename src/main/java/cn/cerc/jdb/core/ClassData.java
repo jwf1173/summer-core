@@ -24,6 +24,7 @@ public class ClassData {
     private Field generationIdentityField = null;
     private String updateKey = "UID_";
     private List<String> searchKeys = new ArrayList<>();
+    private List<String> specialNumKeys = new ArrayList<>();
 
     public ClassData(Class<?> clazz) {
         this.clazz = clazz;
@@ -91,6 +92,8 @@ public class ClassData {
                     updateKey = key;
                 if (item instanceof SearchKey)
                     searchKeys.add(key);
+                if(item instanceof SpecialNum) 
+                    specialNumKeys.add(key);
             }
         }
 
@@ -153,5 +156,9 @@ public class ClassData {
 
     public String getUpdateKey() {
         return updateKey;
+    }
+
+    public List<String> getSpecialNumKeys() {
+        return specialNumKeys;
     }
 }
