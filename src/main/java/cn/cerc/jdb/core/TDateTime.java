@@ -477,7 +477,7 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
     }
 
     /** 是否在指定时间范围内 **/
-    public static boolean isTimeAllow(String start, String last) {
+    public static boolean isInterval(String start, String last) {
         SimpleDateFormat df = new SimpleDateFormat("HH:mm");
         Date now = null;
         Date beginTime = null;
@@ -527,6 +527,6 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
         System.out.println(date2.incMonth(1));
         System.out.println(date2.incMonth(1).monthBof());
 
-        System.out.println(isTimeAllow("05:30", "17:00"));
+        System.out.println(isInterval("05:30", "17:00"));
     }
 }
