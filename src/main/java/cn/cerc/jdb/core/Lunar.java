@@ -5,11 +5,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Lunar {
 
-    private static final Logger log = Logger.getLogger(Lunar.class);
+    private static final Logger log = LoggerFactory.getLogger(Lunar.class);
 
     private int year;
     private int month;

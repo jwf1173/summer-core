@@ -476,6 +476,32 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
             return this.getData().getTime() > tdt.getData().getTime() ? 1 : -1;
     }
 
+    /** 是否在指定时间范围内 **/
+    public static boolean isInterval(String start, String last) {
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+        Date now = null;
+        Date beginTime = null;
+        Date endTime = null;
+        try {
+            now = df.parse(df.format(new Date()));
+            beginTime = df.parse(start);
+            endTime = df.parse(last);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Calendar date = Calendar.getInstance();
+        date.setTime(now);
+
+        Calendar begin = Calendar.getInstance();
+        begin.setTime(beginTime);
+
+        Calendar end = Calendar.getInstance();
+        end.setTime(endTime);
+
+        return date.after(begin) && date.before(end);
+    }
+
     @Override
     public TDateTime clone() {
         return new TDateTime(this.getData());
@@ -500,5 +526,7 @@ public class TDateTime implements Serializable, Comparable<TDateTime>, Cloneable
         System.out.println(date2);
         System.out.println(date2.incMonth(1));
         System.out.println(date2.incMonth(1).monthBof());
+
+        System.out.println(isInterval("05:30", "17:00"));
     }
 }
