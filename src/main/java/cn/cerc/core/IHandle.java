@@ -11,9 +11,6 @@ public interface IHandle {
     // 自定义参数，注：若key=null则返回实现接口的对象本身
     public Object getProperty(String key);
 
-    // 关闭资源
-    public void closeConnections();
-
     // 用户姓名
     public String getUserName();
 
